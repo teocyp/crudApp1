@@ -22,8 +22,15 @@ app.use(methodOverride('_method'));
 const categories = ['fruit', 'vegetable', 'dairy'];
 
 app.get('/products', async (req, res) => {
-    const products = await Product.find({})
-    res.render('products/index', { products });
+    const { category } = req.query;
+    if (category) {
+        const products = await Product.find({ category })
+        res.render('products/index', { products, category });
+
+    } else {
+        const products = await Product.find({})
+        res.render('products/index', { products, category: 'All' });
+    }
 })
 
 app.get('/products/new', (req, res) => {
@@ -54,6 +61,17 @@ app.put('/products/:id', async (req, res) => {
     res.redirect(`'/products'${product._id}`)
 })
 
+
+app.delete('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(id);
+    res.redirect('/products');
+})
+
+
+
 app.listen(3000, () => {
     console.log('Listening on port: 3000')
 })
+
+
